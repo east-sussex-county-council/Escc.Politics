@@ -223,7 +223,6 @@ namespace Escc.Politics
                             member.Name.FamilyName = data.Rows[subRow]["LastName"].ToString();
                             member.Party = new PoliticalParty(data.Rows[subRow]["Party"].ToString());
                             member.NavigateUrl = BuildCouncillorUrl(data.Rows[subRow]["UrlSegment"].ToString(), member.Id);
-                            member.FinancialInterestsUrl = BuildCouncillorFinancialInterestsUrl(member.Id);
                             member.ElectoralDivision = new ElectoralDivision(data.Rows[subRow]["ElectoralDivision"].ToString());
                             member.ElectoralDivision.Id = Int32.Parse(data.Rows[subRow]["ElectoralDivisionId"].ToString(), CultureInfo.InvariantCulture);
                             CommitteeMembership membership = new CommitteeMembership(member);
@@ -264,16 +263,6 @@ namespace Escc.Politics
         private static Uri BuildCouncillorUrl(string electoralDivisionFolder, int councillorId)
         {
             return new Uri("http://www.eastsussex.gov.uk/yourcouncil/about/people/councillors/find/" + electoralDivisionFolder + "/?councillor=" + councillorId);
-        }
-
-        /// <summary>
-        /// Builds the URL for a councillor's financial interests web page
-        /// </summary>
-        /// <param name="councillorId">The councillor id.</param>
-        /// <returns></returns>
-        private static Uri BuildCouncillorFinancialInterestsUrl(int councillorId)
-        {
-            return new Uri("http://www.eastsussex.gov.uk/yourcouncil/about/people/councillors/find/financial.aspx?councillor=" + councillorId);
         }
 
         /// <summary>
@@ -755,7 +744,6 @@ namespace Escc.Politics
             }
             if (dataRecord["interests"] != DBNull.Value) councillor.Interests = dataRecord["interests"].ToString().Trim();
             if (dataRecord["UrlSegment"] != DBNull.Value) councillor.NavigateUrl = BuildCouncillorUrl(dataRecord["UrlSegment"].ToString(), councillor.Id);
-            councillor.FinancialInterestsUrl = BuildCouncillorFinancialInterestsUrl(councillor.Id);
 
 
             BuildCouncillorContactsFromData(dataRecord, councillor);
@@ -1054,62 +1042,6 @@ namespace Escc.Politics
         }
 
         #endregion // Electoral divisions
-
-        #region Financial interests
-
-        /// <summary>
-        /// Reads the questions asked about financial interests.
-        /// </summary>
-        /// <returns></returns>
-        public static Collection<Question> ReadFinancialInterestsQuestions()
-        {
-            Collection<Question> questions = new Collection<Question>();
-            using (IDataReader reader = SqlHelper.ExecuteReader(ConfigurationManager.ConnectionStrings["Escc.Politics.Read"].ConnectionString, CommandType.StoredProcedure, "usp_Question_SelectAll"))
-            {
-                while (reader.Read())
-                {
-                    Question q = new Question();
-                    q.QuestionId = (int)reader["QuestionId"];
-                    q.QuestionReference = reader["QuestionRef"].ToString();
-                    q.Subject = reader["QuestionTitle"].ToString();
-                    q.QuestionText = reader["QuestionText"].ToString();
-                    questions.Add(q);
-                }
-            }
-            return questions;
-        }
-
-        /// <summary>
-        /// Reads an answer given to a question about financial interests.
-        /// </summary>
-        /// <param name="question">The question.</param>
-        /// <param name="councillorId">The councillor id.</param>
-        /// <returns></returns>
-        public static Question ReadFinancialInterestsAnswer(Question question, int councillorId)
-        {
-            if (question == null) throw new ArgumentNullException("question");
-
-            SqlParameter questionParam = new SqlParameter("@questionId", question.QuestionId);
-            SqlParameter councillorParam = new SqlParameter("@memberId", councillorId);
-
-            // Create a copy of the question to return as an answer. That way if called repeatedly client app can have a custom answer for each councillor from the same question object.
-            Question answer = new Question();
-            answer.QuestionId = question.QuestionId;
-            answer.QuestionReference = question.QuestionReference;
-            answer.Subject = question.Subject;
-            answer.QuestionText = question.QuestionText;
-
-            using (IDataReader reader = SqlHelper.ExecuteReader(ConfigurationManager.ConnectionStrings["Escc.Politics.Read"].ConnectionString, CommandType.StoredProcedure, "usp_GetMemberAnswer", questionParam, councillorParam))
-            {
-                if (reader.Read())
-                {
-                    answer.Answer = reader["AnswerText"].ToString();
-                }
-            }
-            return answer;
-        }
-
-        #endregion
 
         #region Surgeries
 
