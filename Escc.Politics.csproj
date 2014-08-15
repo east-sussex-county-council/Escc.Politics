@@ -28,6 +28,8 @@
     <UpgradeBackupLocation />
     <CodeAnalysisCulture>en-GB</CodeAnalysisCulture>
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\Solution files\eastsussex.gov.uk solutions\EsccWebTeam.Website.Solution\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,6 +54,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Escc.AddressAndPersonalDetails">
+      <HintPath>..\..\Solution files\eastsussex.gov.uk solutions\EsccWebTeam.Website.Solution\packages\Escc.AddressAndPersonalDetails.1.0.0\lib\Escc.AddressAndPersonalDetails.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ApplicationBlocks.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=06fad7304560ae6f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>S:\_Reference DLLs\Microsoft Data Access Application Block 2.0\Release strong-named .NET 2.0\Microsoft.ApplicationBlocks.Data.dll</HintPath>
@@ -83,18 +88,22 @@
     <Compile Include="Surgery.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\VS Projects\_Standards\EsccWebTeam.Gdsc\EsccWebTeam.Gdsc.csproj">
-      <Project>{A0024354-DD16-43E1-8574-176F8BA4F1CA}</Project>
-      <Name>EsccWebTeam.Gdsc</Name>
-    </ProjectReference>
+    <Content Include="Sandcastle.shfbproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sandcastle.shfbproj" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)"=="Release" ( if exist "C:\Program Files\EsccWebTeam.SandcastleBuilder\EsccWebTeam.SandcastleBuilder.exe" "C:\Program Files\EsccWebTeam.SandcastleBuilder\EsccWebTeam.SandcastleBuilder.exe" "$(ProjectName)" "$(ProjectDir)Sandcastle.shfbproj" )</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

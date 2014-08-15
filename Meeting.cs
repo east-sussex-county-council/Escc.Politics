@@ -1,6 +1,7 @@
 ﻿
 using System;
-using EsccWebTeam.Gdsc;
+using Escc.AddressAndPersonalDetails;
+
 namespace Escc.Politics
 {
     /// <summary>

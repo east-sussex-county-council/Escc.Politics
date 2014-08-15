@@ -6,9 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
-using System.Security;
-using System.Security.Permissions;
-using EsccWebTeam.Gdsc;
+using Escc.AddressAndPersonalDetails;
 using Microsoft.ApplicationBlocks.Data;
 
 namespace Escc.Politics

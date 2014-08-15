@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using EsccWebTeam.Gdsc;
+using Escc.AddressAndPersonalDetails;
 
 namespace Escc.Politics
 {
